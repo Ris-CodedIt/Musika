@@ -1,0 +1,14 @@
+{
+  "name": "musika",
+  "version": "1.0.0",
+  "description": "This is an farm produce e-commerce  developed using postgres, express, react and node(PERN)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
