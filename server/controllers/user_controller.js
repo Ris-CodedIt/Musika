@@ -216,6 +216,7 @@ const update_is_admin = async(req,res)=>{
         // this is the audit trail section
         let emsg = `Error: ${err}, Request:${req.originalUrl}`
         error_logger.error(emsg)
+        
         const auditObj = {
             username: actionby.username,
             user_id:actionby.user_id,

@@ -7,7 +7,7 @@ const User = require("../models/users")(db.sequelize, DataTypes)
 
 
 router.get('/sync_models',(req,res)=>{
-    db.sequelize.sync()
+    db.sequelize.sync({ force: true })
     .then((response)=>{
          return res.send("all done king")
     })

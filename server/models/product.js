@@ -28,12 +28,18 @@ module.exports = (sequelize, DataTypes)=>{
         allowNull: false
       },
       published: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: "false",
-        validate: {
-          isIn: [['true', 'false']]
-        }
+        type:DataTypes.BOOLEAN ,
+        allowNull:false,
+        defaultValue: false,
+      },
+      is_deleted: {
+        type:DataTypes.BOOLEAN ,
+        allowNull:false,
+        defaultValue: false,
+      },
+      image: {
+        type: DataTypes.TEXT,
+        unique: true,
       },
       category_id: {
         type: DataTypes.INTEGER,
