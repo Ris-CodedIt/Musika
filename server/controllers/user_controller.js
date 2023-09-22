@@ -4,6 +4,7 @@ const User = require("../models/user")(db.sequelize, DataTypes)
 const bcrypt = require("bcrypt")
 const Audit_controller = require("./audit_controller")
 const error_logger = require("../other_config/error_logger")
+const UserValidator = require("../validation/user_validation")
 
 
 const register_user = async(req, res)=>{
@@ -15,6 +16,10 @@ const register_user = async(req, res)=>{
     const username = req.body.username
     const email = req.body.email
     const password = req.body.password
+
+    //validate the input 
+    const {error, value} = UserValidator.user_registration_schema.validate({first_name,last_name,username,email,password},{ abortEarly: false })
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
 
     // check is username allready exist
     const old_username = await  User.findOne({ where: { username: username } })
@@ -63,6 +68,12 @@ const update_names = async(req,res) =>{
     const firstName = req.body.first_name
     const lastName = req.body.last_name
 
+    // validate inputs
+
+    const {error, value} = UserValidator.update_names_schema.validate({first_name : firstName, last_name: lastName}, { abortEarly: false })
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    
+
     const ourUser =  await User.findByPk(id)
     if (ourUser === null){
       let msg = "There was an error finding your account"
@@ -101,6 +112,11 @@ const update_username = async(req,res) =>{
     }
     const id = req.params.id
     const username = req.body.username
+
+    // validate input
+    const {error, value} = UserValidator.update_username_schema.validate({username})
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+
 
     const ourUser =  await User.findByPk(id)
     if (ourUser === null){
@@ -142,6 +158,11 @@ const update_email = async(req,res) =>{
     }
     const id = req.params.id
     const email = req.body.email
+
+    // validate input
+    const {error,value} = UserValidator.update_email_schema.validate({email})
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+
 
     const ourUser =  await User.findByPk(id)
     if (ourUser === null){
@@ -426,6 +447,10 @@ const update_password = async(req,res)=>{
      
     const match = await bcrypt.compare(previousPassword, ourUser.password);
     if(match){
+        // validate new password
+        const {error, value} = UserValidator.update_password_schema.validate({password})
+        if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+
         const hashedPassword = await bcrypt.hash(newPassword,10)
 
         ourUser.set({password:hashedPassword})
@@ -514,6 +539,8 @@ const admin_reset_password = async(req,res)=>{
     })
 }
 
+
+// this section is for fetching user data
 
 
 module.exports = {

@@ -1,15 +1,86 @@
 const db = require("../models")
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, Op, BelongsTo } = require("sequelize");
 const Product = require("../models/product")(db.sequelize, DataTypes)
+const {Category} = require("../models")
 const Audit_controller = require("./audit_controller")
 const error_logger = require("../other_config/error_logger")
+const ProductValidator = require("../validation/product_validation")
 
 
 
 const create_product = async(req, res)=>{
+    if(!req.body.title || !req.body.quantity || !req.body.unit_price || !req.body.description || !req.body.image){
+        return res.status(200).json({success: false, message : "please provide all the requested details" })
+    }
+    const title = req.body.title
+    const quantity = req.body.quantity
+    const unit_price = req.body.unit_price
+    const description = req.body.description
+    const category = req.body.category
+    // edit this part
+    const image = req.body.image
+    
+    // validate inputs
+    const {error, value} = ProductValidator.product_details_schema.validate({title,quantity,unit_price,description,category,image}, { abortEarly: false })
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
 
-    // this is waiting fo multer in order to save images
+    // check if product name already exists
+
+    const oldproduct = await Product.findOne({ where: {title : title}})
+    if(oldproduct !== null) return res.status(200).json({success:false, message : `that product title already exists`})
+
+    await Product.create({
+        title: title,
+        quantity: quantity,
+        unit_price: unit_price,
+        description: description,
+        image : image,
+        category_id: category
+    })
+    .then(response=>{
+           
+        // this is the audit trail section
+        const auditObj = {
+            username: actionby.username,
+            user_id:actionby.user_id,
+            action:"Create Product",
+            message: `Successfull created a product with title ${product.title} `,
+            type: "Success"
+        }
+        
+        Audit_controller.createAuditTrail(auditObj)
+
+        let msg = `you have successfully added a product`
+        return res.status(200).json({success: true, message: msg})
+    })
+
+    .catch(err=>{
+                // this is the audit trail section
+                const auditObj = {
+                    username: actionby.username,
+                    user_id:actionby.user_id,
+                    action:" Create Product",
+                    message: `Attempted to create product with title ${product.title}`,
+                    type: "Failed"
+                }
+                
+                Audit_controller.createAuditTrail(auditObj)
+
+                let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                error_logger.error(emsg)
+        
+                let msg = `an error occured: ${err}`
+                return res.status(200).json({success: true, message: msg})
+    })
+
+
 }
+
+
+
+
+
+
 
 
 const update_product = async(req,res)=>{
@@ -29,6 +100,10 @@ const update_product = async(req,res)=>{
         username : req.username,
         user_id : req.user_id
     }
+
+    // validate inputs
+    const {error, value} = ProductValidator.product_update_details_schema.validate({title,quantity,unit_price,description}, { abortEarly: false })
+    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
 
     // this area is waiting for joi validations
 
@@ -52,7 +127,7 @@ const update_product = async(req,res)=>{
         const auditObj = {
             username: actionby.username,
             user_id:actionby.user_id,
-            action:"Product Update",
+            action:"Update Product",
             message: `Successfull updated the details of product with title ${product.title} `,
             type: "Success"
         }
@@ -68,7 +143,7 @@ const update_product = async(req,res)=>{
                 const auditObj = {
                     username: actionby.username,
                     user_id:actionby.user_id,
-                    action:"Product Update",
+                    action:"Update Product",
                     message: `Attempted to update the details of product with title ${product.title}`,
                     type: "Failed"
                 }
@@ -328,18 +403,11 @@ const unpublish_product= async(req,res)=>{
 
 
 
-
-
-
-
-
 const publish_all_products= async(req,res)=>{
     const actionby = {
         username : req.username,
         user_id : req.user_id
     }
-
-    // logic to publish all products at once should come here
 
     await Product.update({ published : true})
 
@@ -428,4 +496,148 @@ const unpublish_all_products= async(req,res)=>{
                 return res.status(200).json({success: true, message: msg})
     })
     
+}
+
+
+
+// this section is for fetching product data
+
+const get_all_products = async(req,res)=>{
+    await Product.findAll({
+        where: {is_deleted: false},
+        include:[{
+            model: Category,
+            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+        }]})
+        .then((prod)=>{
+            if (prod.length > 0){
+                return res.status(200).json({success:true, data: prod})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+
+}
+
+
+const get_single_product = async(req,res)=>{
+    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submint A Valid product"})
+    await Product.findOne({
+        where:{id : id},
+        include:[{
+            model: Category,
+            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+        }]})
+        .then((prod)=>{
+            if (prod.length > 0){
+                return res.status(200).json({success:true, data: prod})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
+const get_published_products = async(req,res)=>{
+    await Product.findAll({
+        where: {published : true, is_deleted: false},
+        include:[{
+            model: Category,
+            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+        }]})
+        .then((prod)=>{
+            if (prod.length > 0){
+                return res.status(200).json({success:true, data: prod})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
+const get_unpublished_products = async(req,res)=>{
+    await Product.findAll({
+        where: {published : false, is_deleted: false},
+        include:[{
+            model: Category,
+            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+        }]})
+        .then((prod)=>{
+            if (prod.length > 0){
+                return res.status(200).json({success:true, data: prod})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
+
+const get_deleted_products = async(req,res)=>{
+    await Product.findAll({
+        where:{is_deleted: false },
+        include:[{
+            model: Category,
+            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+        }]})
+        .then((prod)=>{
+            if (prod.length > 0){
+                return res.status(200).json({success:true, data: prod})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
+
+module.exports = {
+    create_product,
+    update_product,
+    update_product_category,
+    update_product_image,
+    publish_all_products,
+    unpublish_all_products,
+    publish_product,
+    unpublish_product,
+    get_all_products,
+    get_single_product,
+    get_published_products,
+    get_unpublished_products,
+    get_deleted_products
 }
