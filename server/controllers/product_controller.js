@@ -24,7 +24,7 @@ const create_product = async(req, res)=>{
     const {error, value} = ProductValidator.product_details_schema.validate({title,quantity,unit_price,description,category,image}, { abortEarly: false })
     if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
 
-    // check if product name already exists
+    // check if product title already exists
 
     const oldproduct = await Product.findOne({ where: {title : title}})
     if(oldproduct !== null) return res.status(200).json({success:false, message : `that product title already exists`})
@@ -77,12 +77,6 @@ const create_product = async(req, res)=>{
 }
 
 
-
-
-
-
-
-
 const update_product = async(req,res)=>{
     if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
 
@@ -107,55 +101,64 @@ const update_product = async(req,res)=>{
 
     // this area is waiting for joi validations
 
-    const product =  await Product.findByPk(id)
-    if (product === null){
-      let msg = "please select a valid product"
-      return res.status(200).json({success: false, message: msg})
+    try{
+        const product =  await Product.findByPk(id)
+        if (product === null){
+          let msg = "please select a valid product"
+          return res.status(200).json({success: false, message: msg})
+        }
+    
+        product.set({
+            title : title,
+            quantity: quantity,
+            unit_price: unit_price,
+            description: description
+        })
+    
+        await product.save()
+        .then(response=>{
+               
+            // this is the audit trail section
+            const auditObj = {
+                username: actionby.username,
+                user_id:actionby.user_id,
+                action:"Update Product",
+                message: `Successfull updated the details of product with title ${product.title} `,
+                type: "Success"
+            }
+            
+            Audit_controller.createAuditTrail(auditObj)
+    
+            let msg = `you have successfully updated a product`
+            return res.status(200).json({success: true, message: msg})
+        })
+    
+        .catch(err=>{
+                    // this is the audit trail section
+                    const auditObj = {
+                        username: actionby.username,
+                        user_id:actionby.user_id,
+                        action:"Update Product",
+                        message: `Attempted to update the details of product with title ${product.title}`,
+                        type: "Failed"
+                    }
+                    
+                    Audit_controller.createAuditTrail(auditObj)
+    
+                    let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                    error_logger.error(emsg)
+            
+                    let msg = `an error occured: ${err}`
+                    return res.status(200).json({success: true, message: msg})
+        })
+
+    }catch(err){
+        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+        error_logger.error(emsg)
+        let msg = `an error occured: ${err}`
+        return res.status(200).json({success: true, message: msg})
     }
 
-    product.set({
-        title : title,
-        quantity: quantity,
-        unit_price: unit_price,
-        description: description
-    })
-
-    await product.save()
-    .then(response=>{
-           
-        // this is the audit trail section
-        const auditObj = {
-            username: actionby.username,
-            user_id:actionby.user_id,
-            action:"Update Product",
-            message: `Successfull updated the details of product with title ${product.title} `,
-            type: "Success"
-        }
-        
-        Audit_controller.createAuditTrail(auditObj)
-
-        let msg = `you have successfully updated a product`
-        return res.status(200).json({success: true, message: msg})
-    })
-
-    .catch(err=>{
-                // this is the audit trail section
-                const auditObj = {
-                    username: actionby.username,
-                    user_id:actionby.user_id,
-                    action:"Update Product",
-                    message: `Attempted to update the details of product with title ${product.title}`,
-                    type: "Failed"
-                }
-                
-                Audit_controller.createAuditTrail(auditObj)
-
-                let emsg = `Error: ${err}, Request:${req.originalUrl}`
-                error_logger.error(emsg)
-        
-                let msg = `an error occured: ${err}`
-                return res.status(200).json({success: true, message: msg})
-    })
     
 }
 
@@ -172,52 +175,62 @@ const update_product_category = async(req,res)=>{
         user_id : req.user_id
     }
 
-    // this area is waiting for joi validations
+    try{
+        const product =  await Product.findByPk(id)
+        if (product === null){
+          let msg = "please select a valid product"
+          return res.status(200).json({success: false, message: msg})
+        }
+    
+        product.set({ category_id : category_id})
+    
+        await product.save()
+        .then(response=>{
+               
+            // this is the audit trail section
+            const auditObj = {
+                username: actionby.username,
+                user_id:actionby.user_id,
+                action:"Product Category Update",
+                message: `Successfull updated the category of product with title ${product.title} `,
+                type: "Success"
+            }
+            
+            Audit_controller.createAuditTrail(auditObj)
+    
+            let msg = `you have successfully updated a product category`
+            return res.status(200).json({success: true, message: msg})
+        })
+    
+        .catch(err=>{
+                    // this is the audit trail section
+                    const auditObj = {
+                        username: actionby.username,
+                        user_id:actionby.user_id,
+                        action:"Product Category Update",
+                        message: `Attempted to update the category of product with title ${product.title}`,
+                        type: "Failed"
+                    }
+                    
+                    Audit_controller.createAuditTrail(auditObj)
+    
+                    let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                    error_logger.error(emsg)
+            
+                    let msg = `an error occured: ${err}`
+                    return res.status(200).json({success: true, message: msg})
+        })
 
-    const product =  await Product.findByPk(id)
-    if (product === null){
-      let msg = "please select a valid product"
-      return res.status(200).json({success: false, message: msg})
+    }catch(err){
+            
+        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+        error_logger.error(emsg)
+        let msg = `an error occured: ${err}`
+        return res.status(200).json({success: true, message: msg})
+
     }
 
-    product.set({ category_id : category_id})
 
-    await product.save()
-    .then(response=>{
-           
-        // this is the audit trail section
-        const auditObj = {
-            username: actionby.username,
-            user_id:actionby.user_id,
-            action:"Product Category Update",
-            message: `Successfull updated the category of product with title ${product.title} `,
-            type: "Success"
-        }
-        
-        Audit_controller.createAuditTrail(auditObj)
-
-        let msg = `you have successfully updated a product category`
-        return res.status(200).json({success: true, message: msg})
-    })
-
-    .catch(err=>{
-                // this is the audit trail section
-                const auditObj = {
-                    username: actionby.username,
-                    user_id:actionby.user_id,
-                    action:"Product Category Update",
-                    message: `Attempted to update the category of product with title ${product.title}`,
-                    type: "Failed"
-                }
-                
-                Audit_controller.createAuditTrail(auditObj)
-
-                let emsg = `Error: ${err}, Request:${req.originalUrl}`
-                error_logger.error(emsg)
-        
-                let msg = `an error occured: ${err}`
-                return res.status(200).json({success: true, message: msg})
-    })
     
 }
 
@@ -235,52 +248,61 @@ const update_product_image = async(req,res)=>{
         user_id : req.user_id
     }
 
+   try{
+            const product =  await Product.findByPk(id)
+            if (product === null){
+            let msg = "please select a valid product"
+            return res.status(200).json({success: false, message: msg})
+            }
 
-    const product =  await Product.findByPk(id)
-    if (product === null){
-      let msg = "please select a valid product"
-      return res.status(200).json({success: false, message: msg})
-    }
+            product.set({ category_id : category_id})
 
-    product.set({ category_id : category_id})
-
-    await product.save()
-    .then(response=>{
-           
-        // this is the audit trail section
-        const auditObj = {
-            username: actionby.username,
-            user_id:actionby.user_id,
-            action:"Product Image Update",
-            message: `Successfull updated the image of product with title ${product.title} `,
-            type: "Success"
-        }
-        
-        Audit_controller.createAuditTrail(auditObj)
-
-        let msg = `you have successfully updated a product image`
-        return res.status(200).json({success: true, message: msg})
-    })
-
-    .catch(err=>{
+            await product.save()
+            .then(response=>{
+                
                 // this is the audit trail section
                 const auditObj = {
                     username: actionby.username,
                     user_id:actionby.user_id,
                     action:"Product Image Update",
-                    message: `Attempted to update the image of product with title ${product.title}`,
-                    type: "Failed"
+                    message: `Successfull updated the image of product with title ${product.title} `,
+                    type: "Success"
                 }
                 
                 Audit_controller.createAuditTrail(auditObj)
 
-                let emsg = `Error: ${err}, Request:${req.originalUrl}`
-                error_logger.error(emsg)
-        
-                let msg = `an error occured: ${err}`
+                let msg = `you have successfully updated a product image`
                 return res.status(200).json({success: true, message: msg})
-    })
-    
+            })
+
+            .catch(err=>{
+                        // this is the audit trail section
+                        const auditObj = {
+                            username: actionby.username,
+                            user_id:actionby.user_id,
+                            action:"Product Image Update",
+                            message: `Attempted to update the image of product with title ${product.title}`,
+                            type: "Failed"
+                        }
+                        
+                        Audit_controller.createAuditTrail(auditObj)
+
+                        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                        error_logger.error(emsg)
+                
+                        let msg = `an error occured: ${err}`
+                        return res.status(200).json({success: true, message: msg})
+            })
+            
+
+   }catch(err){
+    let emsg = `Error: ${err}, Request:${req.originalUrl}`
+    error_logger.error(emsg)
+
+    let msg = `an error occured: ${err}`
+    return res.status(200).json({success: true, message: msg})
+   }
+  
 }
 
 
@@ -295,50 +317,60 @@ const publish_product= async(req,res)=>{
     }
 
 
-    const product =  await Product.findByPk(id)
-    if (product === null){
-      let msg = "please select a valid product"
-      return res.status(200).json({success: false, message: msg})
-    }
-
-    product.set({ published : true})
-
-    await product.save()
-    .then(response=>{
-           
-        // this is the audit trail section
-        const auditObj = {
-            username: actionby.username,
-            user_id:actionby.user_id,
-            action:"Product Publishing",
-            message: `Successfull published product with title ${product.title} `,
-            type: "Success"
+    try{
+        const product =  await Product.findByPk(id)
+        if (product === null){
+          let msg = "please select a valid product"
+          return res.status(200).json({success: false, message: msg})
         }
-        
-        Audit_controller.createAuditTrail(auditObj)
+    
+        product.set({ published : true})
+    
+        await product.save()
+        .then(response=>{
+               
+            // this is the audit trail section
+            const auditObj = {
+                username: actionby.username,
+                user_id:actionby.user_id,
+                action:"Product Publishing",
+                message: `Successfull published product with title ${product.title} `,
+                type: "Success"
+            }
+            
+            Audit_controller.createAuditTrail(auditObj)
+    
+            let msg = `you have successfully published a product`
+            return res.status(200).json({success: true, message: msg})
+        })
+    
+        .catch(err=>{
+                    // this is the audit trail section
+                    const auditObj = {
+                        username: actionby.username,
+                        user_id:actionby.user_id,
+                        action:"Product Publishing",
+                        message: `Attempted to publish product with title ${product.title}`,
+                        type: "Failed"
+                    }
+                    
+                    Audit_controller.createAuditTrail(auditObj)
+    
+                    let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                    error_logger.error(emsg)
+            
+                    let msg = `an error occured: ${err}`
+                    return res.status(200).json({success: true, message: msg})
+        })
 
-        let msg = `you have successfully published a product`
+    }catch(err){
+        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+        error_logger.error(emsg)
+
+        let msg = `an error occured: ${err}`
         return res.status(200).json({success: true, message: msg})
-    })
 
-    .catch(err=>{
-                // this is the audit trail section
-                const auditObj = {
-                    username: actionby.username,
-                    user_id:actionby.user_id,
-                    action:"Product Publishing",
-                    message: `Attempted to publish product with title ${product.title}`,
-                    type: "Failed"
-                }
-                
-                Audit_controller.createAuditTrail(auditObj)
-
-                let emsg = `Error: ${err}, Request:${req.originalUrl}`
-                error_logger.error(emsg)
-        
-                let msg = `an error occured: ${err}`
-                return res.status(200).json({success: true, message: msg})
-    })
+    }
     
 }
 
@@ -354,50 +386,60 @@ const unpublish_product= async(req,res)=>{
     }
 
 
-    const product =  await Product.findByPk(id)
-    if (product === null){
-      let msg = "please select a valid product"
-      return res.status(200).json({success: false, message: msg})
-    }
-
-    product.set({ published : false})
-
-    await product.save()
-    .then(response=>{
-           
-        // this is the audit trail section
-        const auditObj = {
-            username: actionby.username,
-            user_id:actionby.user_id,
-            action:"Product Unublishing",
-            message: `Successfull unpublished product with title ${product.title} `,
-            type: "Success"
+     try{
+        const product =  await Product.findByPk(id)
+        if (product === null){
+          let msg = "please select a valid product"
+          return res.status(200).json({success: false, message: msg})
         }
-        
-        Audit_controller.createAuditTrail(auditObj)
+    
+        product.set({ published : false})
+    
+        await product.save()
+        .then(response=>{
+               
+            // this is the audit trail section
+            const auditObj = {
+                username: actionby.username,
+                user_id:actionby.user_id,
+                action:"Product Unublishing",
+                message: `Successfull unpublished product with title ${product.title} `,
+                type: "Success"
+            }
+            
+            Audit_controller.createAuditTrail(auditObj)
+    
+            let msg = `you have successfully published a product`
+            return res.status(200).json({success: true, message: msg})
+        })
+    
+        .catch(err=>{
+                    // this is the audit trail section
+                    const auditObj = {
+                        username: actionby.username,
+                        user_id:actionby.user_id,
+                        action:"Product Unpublishing",
+                        message: `Attempted to unpublish product with title ${product.title}`,
+                        type: "Failed"
+                    }
+                    
+                    Audit_controller.createAuditTrail(auditObj)
+    
+                    let emsg = `Error: ${err}, Request:${req.originalUrl}`
+                    error_logger.error(emsg)
+            
+                    let msg = `an error occured: ${err}`
+                    return res.status(200).json({success: true, message: msg})
+        })
 
-        let msg = `you have successfully published a product`
+     }catch(err){
+        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+        error_logger.error(emsg)
+
+        let msg = `an error occured: ${err}`
         return res.status(200).json({success: true, message: msg})
-    })
 
-    .catch(err=>{
-                // this is the audit trail section
-                const auditObj = {
-                    username: actionby.username,
-                    user_id:actionby.user_id,
-                    action:"Product Unpublishing",
-                    message: `Attempted to unpublish product with title ${product.title}`,
-                    type: "Failed"
-                }
-                
-                Audit_controller.createAuditTrail(auditObj)
-
-                let emsg = `Error: ${err}, Request:${req.originalUrl}`
-                error_logger.error(emsg)
-        
-                let msg = `an error occured: ${err}`
-                return res.status(200).json({success: true, message: msg})
-    })
+     }
     
 }
 
@@ -529,25 +571,30 @@ const get_all_products = async(req,res)=>{
 
 const get_single_product = async(req,res)=>{
     if(!req.params.id) return res.status(200).json({success: false, message: "Please Submint A Valid product"})
-    await Product.findOne({
-        where:{id : id},
-        include:[{
-            model: Category,
-            association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
-        }]})
-        .then((prod)=>{
-            if (prod.length > 0){
-                return res.status(200).json({success:true, data: prod})
-              }
-              let msg = "No data was found"
-              return res.status(200).json({success:false, data: [], message : msg})
-        })
-        .catch((err)=>{
-            let emsg = `Error: ${err}, Request:${req.originalUrl}`
-            error_logger.error(emsg)
-            let msg = `there was an error: conection failed while collecting data`
-            return res.status(200).json({success:false, data:[], message: msg})
-        })
+    const id = req.params.id
+
+    try{
+        const product =  await Product.findOne({
+            where:{id : id},
+            include:[{
+                model: Category,
+                association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
+            }]})
+    
+        if (product === null){
+                let msg = "No product was found"
+                return res.status(200).json({success:false, message : msg})
+        }
+        return res.status(200).json({success:true, data: product})
+
+    }
+    catch(err){
+        let emsg = `Error: ${err}, Request:${req.originalUrl}`
+        error_logger.error(emsg)
+        let msg = `there was an error: conection failed while collecting data`
+        return res.status(200).json({success:false, data:[], message: msg})
+    }
+
 
 }
 

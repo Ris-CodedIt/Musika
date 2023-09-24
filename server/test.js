@@ -1,17 +1,34 @@
-const { ValidationError } = require("sequelize")
-const ProductValidator = require("./validation/product_validation")
-const UserValidation = require("./validation/user_validation")
+const db = require("./models")
+const { DataTypes, Op } = require("sequelize");
+const User = require("./models/users")(db.sequelize, DataTypes)
 
 
 
-const {error, value} = ProductValidator.product_details_schema.validate({
-    title: "id_",
-    quantity: "12",
-    unit_price: 12,
-    description:"kifikdkdkdkdkdkd",
-    image : ".."
-},{ abortEarly: false })
+
+const get_single_user = async()=>{
 
 
-console.log(error)
-console.log(value)
+    const id = 2
+   
+    const user = await User.findByPk(id)
+    if (user === null){
+        console.log("no user")
+        
+      }
+     
+    console.log(user)
+   
+  
+
+
+   console.log ("this was done ")
+   console.log ("this was done ")
+   console.log ("this was done ")
+   console.log ("this was done ")
+   console.log ("this was done ")
+
+}
+
+
+
+get_single_user()

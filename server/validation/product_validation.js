@@ -20,8 +20,11 @@ const product_update_details_schema = Joi.object({
 
 
 const product_review_schema = Joi.object({
-    review: Joi.string().min(30).required(),
+    review: Joi.string().min(3).required(),
     rating: Joi.number().positive().min(1).max(5).required(),
+})
+const product_category_schema = Joi.object({
+    title: Joi.string().min(3).required(),
 })
 
 
@@ -29,5 +32,6 @@ const product_review_schema = Joi.object({
 module.exports = {
     product_details_schema,
     product_review_schema,
-    product_update_details_schema
+    product_update_details_schema,
+    product_category_schema
 }
