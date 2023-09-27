@@ -4,6 +4,7 @@ const db = require("../models")
 const bcrypt = require("bcrypt")
 const { DataTypes } = require("sequelize");
 const User = require("../models/users")(db.sequelize, DataTypes)
+const multer_error_handler = require("../middleware/multer_error_handler")
 
 
 router.get('/sync_models',(req,res)=>{
@@ -40,6 +41,16 @@ router.get('/seed_super_admin',async(req,res)=>{
         let msg = `an error occured: ${err}`
         return res.status(200).json({success: false, message: msg})
     })
+})
+
+router.post("/test", multer_error_handler, async(req,res)=>{
+    if(!req.body.title){
+        return res.status(400).json({success: false, message : "please provide all the requested details title is no that" })
+    }
+    console.log(`path: ${req.file.path}`)
+    console.log(`title: ${req.body.title}`)
+    return res.status(200).json({success: false, message : "image recieved" })
+
 })
 
 module.exports = router

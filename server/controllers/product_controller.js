@@ -8,9 +8,10 @@ const ProductValidator = require("../validation/product_validation")
 
 
 
+
 const create_product = async(req, res)=>{
-    if(!req.body.title || !req.body.quantity || !req.body.unit_price || !req.body.description || !req.body.image){
-        return res.status(200).json({success: false, message : "please provide all the requested details" })
+    if(!req.body.title || !req.body.quantity || !req.body.unit_price || !req.body.description){
+        return res.status(400).json({success: false, message : "please provide all the requested details" })
     }
     const title = req.body.title
     const quantity = req.body.quantity
@@ -18,7 +19,7 @@ const create_product = async(req, res)=>{
     const description = req.body.description
     const category = req.body.category
     // edit this part
-    const image = req.body.image
+    const image = req.file.path
     
     // validate inputs
     const {error, value} = ProductValidator.product_details_schema.validate({title,quantity,unit_price,description,category,image}, { abortEarly: false })
@@ -242,7 +243,7 @@ const update_product_image = async(req,res)=>{
     if(!req.body.category_id) return res.status(200).json({success: false, message : "please provide all the requested details" })
 
     const id = req.params.product_id
-    const image = req.body.category_id
+    const image = req.file.path
     const actionby = {
         username : req.username,
         user_id : req.user_id
@@ -255,7 +256,7 @@ const update_product_image = async(req,res)=>{
             return res.status(200).json({success: false, message: msg})
             }
 
-            product.set({ category_id : category_id})
+            product.set({ image : image})
 
             await product.save()
             .then(response=>{

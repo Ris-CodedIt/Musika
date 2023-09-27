@@ -13,6 +13,7 @@ app.use(logger("tiny"))
 app.use(credential)
 app.use(cors(corsOptions))
 app.use(express.json())
+app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 app.use("/api/v1/init", db_init)
 
