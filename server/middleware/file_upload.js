@@ -21,8 +21,7 @@ const upload = multer({
             return cb(null, true)
         }
         else{
-            cb(null, false)
-            cb( new Error("only jpg, jpeg and png files are allowed"))
+           return cb( new Error("only jpg, jpeg and png files are allowed"))
         }
        
     }
