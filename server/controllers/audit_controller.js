@@ -27,7 +27,7 @@ const createAuditTrail = async(auditObj)=>{
 
 
 const getAllAudittrails = async(req,res)=>{
-  if(!req.body.startDate || !req.body.endDate) return res.status(200).json({success:false, data:[], message: "please select valid date"})
+  if(!req.body.startDate || !req.body.endDate) return res.status(400).json({success:false, data:[], message: "please select valid dates"})
   let startDate= req.body.startDate
   let endDate = req.body.endDate
       await Audit.findAll({
@@ -56,9 +56,10 @@ const getAllAudittrails = async(req,res)=>{
 
 
 const getUserAudittrails = async(req,res)=>{
-      const username = req.params.username 
+      if(!req.params.id) return res.status(400).json({success: false, message: "Please provide a valid user"})
+      const id = req.params.id
 
-      await Audit.findAll()
+      await Audit.findAll({where : {user_id:id}})
       .then(trails=>{
         return res.status(200).json({success: true, data: trails})
       })

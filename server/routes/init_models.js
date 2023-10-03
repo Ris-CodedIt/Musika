@@ -43,6 +43,8 @@ router.get('/seed_super_admin',async(req,res)=>{
     })
 })
 
+// this below rout was jus for test multer instance
+
 router.post("/test", multer_error_handler, async(req,res)=>{
     if(!req.body.title){
         return res.status(400).json({success: false, message : "please provide all the requested details title is no that" })

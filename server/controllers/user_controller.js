@@ -9,25 +9,28 @@ const UserValidator = require("../validation/user_validation")
 
 const register_user = async(req, res)=>{
     if(!req.body.first_name || !req.body.last_name || !req.body.username || !req.body.email || !req.body.password){
-        return res.status(200).json({success: false, message : "please provide all the requested details" })
+        return res.status(400).json({success: false, message : "please provide all the requested details" })
     }
-    const first_name = req.body.first_name
-    const last_name = req.body.last_name
-    const username = req.body.username
-    const email = req.body.email
-    const password = req.body.password
+    const user_details = {
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password
+    }
+  
 
     //validate the input 
-    const {error, value} = UserValidator.user_registration_schema.validate({first_name,last_name,username,email,password},{ abortEarly: false })
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    const {error, value} = UserValidator.user_registration_schema.validate(user_details,{ abortEarly: false })
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
     // check is username allready exist
-    const old_username = await  User.findOne({ where: { username: username } })
-    if (old_username !== null) return res.status(200).json({success:false, message : "that username already exists"})
+    const old_username = await  User.findOne({ where: { username: user_details.username } })
+    if (old_username !== null) return res.status(400).json({success:false, message : "that username already exists"})
     
     // check is email allready exist
-    const old_useremail = await  User.findOne({ where: { email: email} })
-    if (old_useremail !== null) return res.status(200).json({success:false, message : "that email already exists"})
+    const old_useremail = await  User.findOne({ where: { email: user_details.email} })
+    if (old_useremail !== null) return res.status(400).json({success:false, message : "that email already exists"})
 
 
 
@@ -59,10 +62,10 @@ const register_user = async(req, res)=>{
 
 
 const update_names = async(req,res) =>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
 
     if(!req.body.first_name || !req.body.last_name ){
-        return res.status(200).json({success: false, message : "please provide all the requested details" })
+        return res.status(400).json({success: false, message : "please provide all the requested details" })
     }
     const id = req.params.id
     const firstName = req.body.first_name
@@ -71,7 +74,7 @@ const update_names = async(req,res) =>{
     // validate inputs
 
     const {error, value} = UserValidator.update_names_schema.validate({first_name : firstName, last_name: lastName}, { abortEarly: false })
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
     
     try{
          
@@ -114,17 +117,17 @@ const update_names = async(req,res) =>{
 
 
 const update_username = async(req,res) =>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
 
     if(!req.body.username ){
-        return res.status(200).json({success: false, message : "please provide  a valid username" })
+        return res.status(400).json({success: false, message : "please provide  a valid username" })
     }
     const id = req.params.id
     const username = req.body.username
 
     // validate input
     const {error, value} = UserValidator.update_username_schema.validate({username})
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
 
     try{
@@ -139,7 +142,7 @@ const update_username = async(req,res) =>{
         
         // now checking if the new username already exists
         const old_username = await  User.findOne({ where: { username: username } })
-        if (old_username !== null) return res.status(200).json({success:false, message : "that username already exists"})
+        if (old_username !== null) return res.status(400).json({success:false, message : "that username already exists"})
         
         ourUser.set({username: username})
 
@@ -170,17 +173,17 @@ const update_username = async(req,res) =>{
 
 
 const update_email = async(req,res) =>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
 
     if(!req.body.email ){
-        return res.status(200).json({success: false, message : "please provide  a valid email" })
+        return res.status(400).json({success: false, message : "please provide  a valid email" })
     }
     const id = req.params.id
     const email = req.body.email
 
     // validate input
     const {error,value} = UserValidator.update_email_schema.validate({email})
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
      try{
         const ourUser =  await User.findByPk(id)
@@ -194,7 +197,7 @@ const update_email = async(req,res) =>{
         
         // now checking if the new email already exists
         const old_email = await  User.findOne({ where: { email: email } })
-        if (old_email !== null) return res.status(200).json({success:false, message : "that email already exists"})
+        if (old_email !== null) return res.status(400).json({success:false, message : "that email already exists"})
         
         ourUser.set({email: email})
     
@@ -226,8 +229,8 @@ const update_email = async(req,res) =>{
 
 
 
-const update_is_admin = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+const set_is_admin = async(req,res)=>{
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
     const id = req.params.id
 
     const actionby = {
@@ -295,7 +298,7 @@ const update_is_admin = async(req,res)=>{
 
 
 const revoke_is_admin = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
     const id = req.params.id
 
     const actionby = {
@@ -364,7 +367,7 @@ const revoke_is_admin = async(req,res)=>{
 
 
 const deactivate_user = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
     const id = req.params.id
     const actionby = {
         username : req.username,
@@ -432,7 +435,7 @@ const deactivate_user = async(req,res)=>{
 
 
 const activate_user = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
     const id = req.params.id
     const actionby = {
         username : req.username,
@@ -499,7 +502,7 @@ const activate_user = async(req,res)=>{
 }
 
 const update_password = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submit a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submit a valid user"})
     const previousPassword = req.body.previous_password
     const newPassword = req.body.new_password
 
@@ -555,7 +558,7 @@ const update_password = async(req,res)=>{
 
 
 const admin_reset_password = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "please submint a valid user"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "please submint a valid user"})
     const id = req.params.id
     const actionby = {
         username : req.username,
@@ -647,7 +650,7 @@ const get_all_users = async(req,res)=>{
 
 
 const get_single_user = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submint A Valid User"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submint A Valid User"})
 
     const id = req.params.id
     try{
@@ -670,7 +673,7 @@ const get_single_user = async(req,res)=>{
 }
 
 const get_current_user = async(req,res)=>{
-    if(!req.user_id) return res.status(200).json({success: false, message: "Please Submint A Valid User"})
+    if(!req.user_id) return res.status(400).json({success: false, message: "Please Submint A Valid User"})
 
     const id = req.user_id
     try{
@@ -698,7 +701,7 @@ module.exports = {
     update_names,
     update_password,
     update_email,
-    update_is_admin,
+    set_is_admin,
     update_username,
     revoke_is_admin,
     activate_user,

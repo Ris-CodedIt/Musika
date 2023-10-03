@@ -13,31 +13,26 @@ const create_product = async(req, res)=>{
     if(!req.body.title || !req.body.quantity || !req.body.unit_price || !req.body.description){
         return res.status(400).json({success: false, message : "please provide all the requested details" })
     }
-    const title = req.body.title
-    const quantity = req.body.quantity
-    const unit_price = req.body.unit_price
-    const description = req.body.description
-    const category = req.body.category
-    // edit this part
-    const image = req.file.path
+    const product_details = {
+        title : req.body.title,
+        quantity : req.body.quantity,
+        unit_price : req.body.unit_price,
+        description : req.body.description,
+        category : req.body.category,
+        image : req.file.path
+    }
+ 
     
     // validate inputs
-    const {error, value} = ProductValidator.product_details_schema.validate({title,quantity,unit_price,description,category,image}, { abortEarly: false })
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    const {error, value} = ProductValidator.product_details_schema.validate(product_details, { abortEarly: false })
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
     // check if product title already exists
 
-    const oldproduct = await Product.findOne({ where: {title : title}})
-    if(oldproduct !== null) return res.status(200).json({success:false, message : `that product title already exists`})
+    const oldproduct = await Product.findOne({ where: {title :product_details.title}})
+    if(oldproduct !== null) return res.status(400).json({success:false, message : `that product title already exists`})
 
-    await Product.create({
-        title: title,
-        quantity: quantity,
-        unit_price: unit_price,
-        description: description,
-        image : image,
-        category_id: category
-    })
+    await Product.create(product_details)
     .then(response=>{
            
         // this is the audit trail section
@@ -79,17 +74,19 @@ const create_product = async(req, res)=>{
 
 
 const update_product = async(req,res)=>{
-    if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
+    if(!req.params.product_id) return res.status(400).json({success: false, message : "please provide a valid product" })
 
     if(!req.body.title || !req.body.quantity || !req.body.unit_price || !req.body.description){
-        return res.status(200).json({success: false, message : "please provide all the requested details" })
+        return res.status(400).json({success: false, message : "please provide all the requested details" })
     }
 
     const id = req.params.product_id
-    const title = req.body.title
-    const quantity = req.body.quantity
-    const unit_price = req.body.unit_price
-    const description = req.body.description
+    const product_details = {
+        title : req.body.title,
+        quantity : req.body.quantity,
+        unit_price : req.body.unit_price,
+        description : req.body.description,
+    }
 
     const actionby = {
         username : req.username,
@@ -97,8 +94,8 @@ const update_product = async(req,res)=>{
     }
 
     // validate inputs
-    const {error, value} = ProductValidator.product_update_details_schema.validate({title,quantity,unit_price,description}, { abortEarly: false })
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    const {error, value} = ProductValidator.product_update_details_schema.validate(product_details, { abortEarly: false })
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
     // this area is waiting for joi validations
 
@@ -109,12 +106,7 @@ const update_product = async(req,res)=>{
           return res.status(200).json({success: false, message: msg})
         }
     
-        product.set({
-            title : title,
-            quantity: quantity,
-            unit_price: unit_price,
-            description: description
-        })
+        product.set(product_details)
     
         await product.save()
         .then(response=>{
@@ -165,9 +157,9 @@ const update_product = async(req,res)=>{
 
 
 const update_product_category = async(req,res)=>{
-    if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
+    if(!req.params.product_id) return res.status(400).json({success: false, message : "please provide a valid product" })
 
-    if(!req.body.category_id) return res.status(200).json({success: false, message : "please provide all the requested details" })
+    if(!req.body.category_id) return res.status(400).json({success: false, message : "please provide all the requested details" })
 
     const id = req.params.product_id
     const category_id = req.body.category_id
@@ -238,9 +230,9 @@ const update_product_category = async(req,res)=>{
 
 // The function below must be fine tuned to accept an image update
 const update_product_image = async(req,res)=>{
-    if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
+    if(!req.params.product_id) return res.status(400).json({success: false, message : "please provide a valid product" })
 
-    if(!req.body.category_id) return res.status(200).json({success: false, message : "please provide all the requested details" })
+    if(!req.body.category_id) return res.status(400).json({success: false, message : "please provide all the requested details" })
 
     const id = req.params.product_id
     const image = req.file.path
@@ -309,7 +301,7 @@ const update_product_image = async(req,res)=>{
 
 
 const publish_product= async(req,res)=>{
-    if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
+    if(!req.params.product_id) return res.status(400).json({success: false, message : "please provide a valid product" })
 
     const id = req.params.product_id
     const actionby = {
@@ -378,7 +370,7 @@ const publish_product= async(req,res)=>{
 
 
 const unpublish_product= async(req,res)=>{
-    if(!req.params.product_id) return res.status(200).json({success: false, message : "please provide a valid product" })
+    if(!req.params.product_id) return res.status(400).json({success: false, message : "please provide a valid product" })
 
     const id = req.params.product_id
     const actionby = {
@@ -571,7 +563,7 @@ const get_all_products = async(req,res)=>{
 
 
 const get_single_product = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submint A Valid product"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submint A Valid product"})
     const id = req.params.id
 
     try{

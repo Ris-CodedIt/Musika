@@ -1,6 +1,6 @@
 const db = require("../models")
 const { DataTypes, Op } = require("sequelize");
-const Review = require("../models/users")(db.sequelize, DataTypes)
+const Review = require("../models/reviews")(db.sequelize, DataTypes)
 const error_logger = require("../other_config/error_logger")
 const ProductValidator = require("../validation/product_validation")
 
@@ -8,30 +8,32 @@ const ProductValidator = require("../validation/product_validation")
 
 
 const create_review = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submit A Valid product"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submit A Valid product"})
 
-    if(!req.body.review || !req.body.rating) return res.status(200).json({success: false, message: "Please provide all required data"})
+    if(!req.body.review || !req.body.rating) return res.status(400).json({success: false, message: "Please provide all required data"})
+    const review_details = {
+        review: req.body.review,
+        rating: req.body.rating,
+        user_id: req.user_id,
+        product_id: req.params.id
+    }
 
-    const review = req.body.review
-    const rating = req.body.rating
-    const user_id = req.user_id
-    const product_id = req.params.id
 
 
     // validate input 
 
-    const {error, value} = ProductValidator.product_review_schema.validate({review, rating})
+    const {error, value} = ProductValidator.product_review_schema.validate({review: review_details.review, rating: review_details.rating} , { abortEarly: false })
 
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
+
+
+    //Check if this user has ever purchased this product
+
+
 
     // creating review 
 
-    await Review.create({
-        review: review,
-        rating: rating,
-        user_id: user_id,
-        product_id: product_id
-    })
+    await Review.create(review_details)
     .then(resp=>{
 
         let msg = "you have successfully posted a review"
@@ -50,9 +52,9 @@ const create_review = async(req,res)=>{
 
 
 const update_review = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submit A Valid product"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submit A Valid product"})
 
-    if(!req.body.review || !req.body.rating) return res.status(200).json({success: false, message: "Please provide all required data"})
+    if(!req.body.review || !req.body.rating) return res.status(400).json({success: false, message: "Please provide all required data"})
 
     const review = req.body.review
     const rating = req.body.rating
@@ -61,9 +63,9 @@ const update_review = async(req,res)=>{
 
     // validate input 
 
-    const {error, value} = ProductValidator.product_review_schema.validate({review, rating})
+    const {error, value} = ProductValidator.product_review_schema.validate({review, rating} , { abortEarly: false })
 
-    if(error) return res.status(200).json({success:false, message : `There was an error: ${error}`})
+    if(error) return res.status(400).json({success:false, message : `There was an error: ${error}`})
 
 
     try{
@@ -83,7 +85,7 @@ const update_review = async(req,res)=>{
             await our_review.save()
             .then(resp=>{
 
-                let msg = "you have successfully posted a review"
+                let msg = "you have successfully edited your review"
                 return res.status(200).json({success: true, message: msg})
             })
             .catch(err=>{
@@ -109,9 +111,7 @@ const update_review = async(req,res)=>{
 
 
 const delete_review = async(req,res)=>{
-    if(!req.params.id) return res.status(200).json({success: false, message: "Please Submit A Valid product"})
-
-    if(!req.body.review || !req.body.rating) return res.status(200).json({success: false, message: "Please provide all required data"})
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submit A Valid product"})
 
     const id = req.params.id
 
