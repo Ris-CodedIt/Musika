@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes)=>{
         type: DataTypes.FLOAT,
         allowNull: false,
         defaultValue: 0.0
-      },
+      }, 
       description: {
         type: DataTypes.TEXT,
         allowNull: false

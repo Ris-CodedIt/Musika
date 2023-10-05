@@ -1,6 +1,7 @@
 const db = require("../models")
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes, Op, BelongsTo, HasOne } = require("sequelize");
 const User = require("../models/users")(db.sequelize, DataTypes)
+const {CustomerDetails} = require("../models")
 const bcrypt = require("bcrypt")
 const Audit_controller = require("./audit_controller")
 const error_logger = require("../other_config/error_logger")
@@ -631,7 +632,12 @@ const admin_reset_password = async(req,res)=>{
 // this section is for fetching user data
 
 const get_all_users = async(req,res)=>{
-     await User.findAll()
+     await User.findAll({   
+         include:[{
+            model:UserRoles,
+            association: new HasOne(User, CustomerDetails, { foreignKey: 'user_id'})
+         }]
+    })
             .then((users)=>{
                 if (users.length > 0){
                     return res.status(200).json({success:true, data: users})
@@ -654,7 +660,13 @@ const get_single_user = async(req,res)=>{
 
     const id = req.params.id
     try{
-        const user = await User.findByPk(id)
+        const user = await User.findOne({
+            where: {id:id},
+            include:[{
+                model:UserRoles,
+                association: new HasOne(User, CustomerDetails, { foreignKey: 'user_id'})
+             }]
+        })
         if (user === null){
            let msg = "No user was found"
            return res.status(200).json({success:false,data:[], message : msg})

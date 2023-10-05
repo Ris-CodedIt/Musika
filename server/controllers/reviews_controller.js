@@ -1,6 +1,7 @@
 const db = require("../models")
 const { DataTypes, Op } = require("sequelize");
 const Review = require("../models/reviews")(db.sequelize, DataTypes)
+const {User} = require("../models")
 const error_logger = require("../other_config/error_logger")
 const ProductValidator = require("../validation/product_validation")
 
@@ -132,9 +133,68 @@ const delete_review = async(req,res)=>{
 }
 
 
+const get_product_reviews = async(req,res)=>{
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submit A Valid product"})
+    const id = req.params.id
+
+    await Review.findAll({
+        where: {product_id: id},
+        include:[{
+            model:User,
+            association: new BelongsTo(Review, User, { foreignKey: 'user_id'})
+        }]
+    
+    })
+        .then((rev)=>{
+            if (rev.length > 0){
+                return res.status(200).json({success:true, data: rev})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: connection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+const get_product_reviews_by_user = async(req,res)=>{
+    if(!req.params.id) return res.status(400).json({success: false, message: "Please Submit A Valid product"})
+    const id = req.params.id
+
+    await Review.findAll({
+        where: {user_id: id},
+        include:[{
+            model:User,
+            association: new BelongsTo(Review, User, { foreignKey: 'user_id'})
+        }]
+    
+    })
+        .then((rev)=>{
+            if (rev.length > 0){
+                return res.status(200).json({success:true, data: rev})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: connection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
 
 module.exports = {
     create_review,
     update_review,
-    delete_review
+    delete_review,
+    get_product_reviews,
+    get_product_reviews_by_user
 }

@@ -103,10 +103,33 @@ const delete_category = async(req, res)=>{
     })
 } 
 
+const get_categories = async(req,res)=>{
+    await Category.findAll()
+        .then((cat)=>{
+            if (cat.length > 0){
+                return res.status(200).json({success:true, data: cat})
+              }
+              let msg = "No data was found"
+              return res.status(200).json({success:false, data: [], message : msg})
+        })
+        .catch((err)=>{
+            let emsg = `Error: ${err}, Request:${req.originalUrl}`
+            error_logger.error(emsg)
+            let msg = `there was an error: conection failed while collecting data`
+            return res.status(200).json({success:false, data:[], message: msg})
+        })
+
+}
+
+
+
+
+
 
 
 module.exports = {
     create_category,
     update_category,
-    delete_category
+    delete_category,
+    get_categories
 }

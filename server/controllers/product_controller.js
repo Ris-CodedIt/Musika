@@ -1,5 +1,5 @@
 const db = require("../models")
-const { DataTypes, Op, BelongsTo } = require("sequelize");
+const { DataTypes, Op, BelongsTo, HasMany } = require("sequelize");
 const Product = require("../models/product")(db.sequelize, DataTypes)
 const {Category} = require("../models")
 const Audit_controller = require("./audit_controller")
@@ -569,10 +569,13 @@ const get_single_product = async(req,res)=>{
     try{
         const product =  await Product.findOne({
             where:{id : id},
-            include:[{
+            include:[
+                {
                 model: Category,
                 association: new BelongsTo(Product, Category, { foreignKey: 'category_id'})
-            }]})
+            }],
+        
+        })
     
         if (product === null){
                 let msg = "No product was found"
