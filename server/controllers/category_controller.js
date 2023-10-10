@@ -3,7 +3,6 @@ const { DataTypes, Op } = require("sequelize");
 const Category = require("../models/category")(db.sequelize, DataTypes)
 const error_logger = require("../other_config/error_logger")
 const ProductValidator = require("../validation/product_validation");
-const category = require("../models/category");
 
 
 

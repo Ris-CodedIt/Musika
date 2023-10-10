@@ -17,9 +17,18 @@ module.exports = (sequelize, DataTypes)=>{
         validate: {
           isIn: [['PENDING', 'COMPLETE', 'CANCLED']]
         }
-      }
-
-
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: "users",
+            key: 'id',
+            onDelete: 'RESTRICT',
+            onUpdate: 'CASCADE'
+        }
+    }
+      
     }, {
   tableName: 'orders',
   underscored: true

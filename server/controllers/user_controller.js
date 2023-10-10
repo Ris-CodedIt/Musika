@@ -663,7 +663,7 @@ const get_single_user = async(req,res)=>{
         const user = await User.findOne({
             where: {id:id},
             include:[{
-                model:UserRoles,
+                model:CustomerDetails,
                 association: new HasOne(User, CustomerDetails, { foreignKey: 'user_id'})
              }]
         })
