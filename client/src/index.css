@@ -1,69 +1,182 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+:root{
+  --font-family: 'Montserrat', sans-serif;
+  --base-green: #03C04A;
+  --faint-green: #03c04c5b;
+  --base-white: ghostwhite;
+  --base-black: #000000;
+  --faint-black: #00000081; 
+  --box-shadow: rgba(0,0,0,0.2);
+
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
 
-body {
+
+*{
+  font-family: var(--font-family);
+  box-sizing: border-box;
+  padding: 0;
   margin: 0;
+}
+
+
+body{
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background-color: var(--base-white);
+}
+
+#root{
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  background-color: var(--base-white);
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* -----------------Navigation bar section--------------------------*/
+
+.navigationbar{
+  width: 100%;
+  height: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 0 4px var(--box-shadow);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.navigationbar .top-part {
+  width: 100%;
+  height: 30%;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--faint-green);
+  color: var(--base-black);
+  font-size: 0.8rem;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+
+.navigationbar .bottom-part{
+  width: 100%;
+  height: 68%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+}
+
+.navigationbar .bottom-part .logo-div{
+  width: 30%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--base-green);
+  font-size: 1.5rem;
+  font-family: var(--font-family);
+  font-weight: 600;
+}
+
+.navigationbar .bottom-part .logo-div .logo-icon-div{
+  margin: 0 10px;
+}
+
+.navigationbar .bottom-part .logo-div .logo-name-div{
+  margin: 0 10px;
+  letter-spacing: 1px;
+}
+
+
+.navigationbar .bottom-part .navigationbar-link-section{
+  height: 100%;
+  width: 40%;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-evenly;
+}
+
+.navigationbar .bottom-part .navigationbar-link-section .link{
+  width: 24%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.5s;
+}
+
+
+
+.navigationbar .bottom-part .navigationbar-link-section .link:hover{
+  background-color: var(--faint-green);
+  border-radius: 5px;
+
+}
+
+
+.navigationbar .bottom-part .navigation-user-name-or-login{
+  width: 20%;
+  height: 100%;
+  padding-right: 10px; 
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.navigationbar .bottom-part .navigation-user-name-or-login .username-text{
+  margin: 0 10px;
+  padding-left: 5px;
+  height: 50%;
+  border-left: 1px solid var(--faint-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--faint-black);
+}
+
+.navigationbar .bottom-part .navigation-user-name-or-login .profile-image {
+  font-size: 1.5rem;
+  color: var(--base-green);
+}
+
+
+.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn{
+  font-size: 1rem;
+  padding: 10px 15px;
+  background-color: var(--base-green);
+  border-radius: 20px;
+  border: none;
+  transition: 0.5s;
+}
+
+.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn:hover{
+   background-color: var(--faint-green);
+}
+
+
+.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn:active{
+  transform: scale(0.9);
+}
+
+
+
+/* ------------------------Main Section (this is the section below the navigation page)-------------------------- */
+.main{
+  width: 100%;
+  height: 88%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
