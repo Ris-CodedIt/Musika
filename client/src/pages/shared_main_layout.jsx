@@ -1,4 +1,5 @@
 import NavigationBar from "../components/navigation_bar"
+import HomePageSlider from "../components/home_page_slider"
 
 
 const SharedMainLayout = ()=>{
@@ -6,7 +7,9 @@ const SharedMainLayout = ()=>{
         <>
         <NavigationBar/>
         <div className="main">
-            This Is main
+            <div className="slide-main-container">
+              <HomePageSlider/>
+            </div>  
         </div>
         </>
     )
