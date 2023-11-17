@@ -1,28 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
 
-
-:root{
-  --font-family: 'Montserrat', sans-serif;
-  --base-green: #03C04A;
+:root {
+  --font-family: "Montserrat", sans-serif;
+  --base-green: #03c04a;
   --faint-green: #03c04c5b;
   --base-white: ghostwhite;
   --base-black: #000000;
-  --faint-black: #00000081; 
-  --box-shadow: rgba(0,0,0,0.2);
-
+  --faint-black: #00000081;
+  --box-shadow: rgba(0, 0, 0, 0.2);
 }
 
-
-
-*{
+* {
   font-family: var(--font-family);
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
-
-body{
+body {
   width: 100vw;
   height: 100vh;
   padding: 0;
@@ -31,7 +26,7 @@ body{
   background-color: var(--base-white);
 }
 
-#root{
+#root {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -41,44 +36,22 @@ body{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* -----------------Navigation bar section--------------------------*/
 
-.navigationbar{
+.navigationbar {
   width: 100%;
-  height: 12%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 0 4px var(--box-shadow);
-}
-
-.navigationbar .top-part {
-  width: 100%;
-  height: 30%;
-  padding: 0 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: var(--faint-green);
-  color: var(--base-black);
-  font-size: 0.8rem;
-}
-
-
-.navigationbar .bottom-part{
-  width: 100%;
-  height: 68%;
+  height: 8%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 1rem;
+  box-shadow: 0 0 4px var(--box-shadow);
 }
 
-.navigationbar .bottom-part .logo-div{
+.navigationbar .logo-div {
   width: 30%;
   height: 100%;
   display: flex;
@@ -90,17 +63,16 @@ body{
   font-weight: 600;
 }
 
-.navigationbar .bottom-part .logo-div .logo-icon-div{
+.navigationbar .logo-div .logo-icon-div {
   margin: 0 10px;
 }
 
-.navigationbar .bottom-part .logo-div .logo-name-div{
+.navigationbar .logo-div .logo-name-div {
   margin: 0 10px;
   letter-spacing: 1px;
 }
 
-
-.navigationbar .bottom-part .navigationbar-link-section{
+.navigationbar .navigationbar-link-section {
   height: 100%;
   width: 40%;
   display: flex;
@@ -108,7 +80,7 @@ body{
   justify-content: space-evenly;
 }
 
-.navigationbar .bottom-part .navigationbar-link-section .link{
+.navigationbar .navigationbar-link-section .link {
   width: 24%;
   display: flex;
   align-items: center;
@@ -116,25 +88,21 @@ body{
   transition: 0.5s;
 }
 
-
-
-.navigationbar .bottom-part .navigationbar-link-section .link:hover{
+.navigationbar .navigationbar-link-section .link:hover {
   background-color: var(--faint-green);
   border-radius: 5px;
-
 }
 
-
-.navigationbar .bottom-part .navigation-user-name-or-login{
+.navigationbar .navigation-user-name-or-login {
   width: 20%;
   height: 100%;
-  padding-right: 10px; 
+  padding-right: 10px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
 
-.navigationbar .bottom-part .navigation-user-name-or-login .username-text{
+.navigationbar .navigation-user-name-or-login .username-text {
   margin: 0 10px;
   padding-left: 5px;
   height: 50%;
@@ -146,13 +114,12 @@ body{
   color: var(--faint-black);
 }
 
-.navigationbar .bottom-part .navigation-user-name-or-login .profile-image {
+.navigationbar .navigation-user-name-or-login .profile-image {
   font-size: 1.5rem;
   color: var(--base-green);
 }
 
-
-.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn{
+.navigationbar .navigation-user-name-or-login .sign-in-btn {
   font-size: 1rem;
   padding: 10px 15px;
   background-color: var(--base-green);
@@ -161,43 +128,96 @@ body{
   transition: 0.5s;
 }
 
-.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn:hover{
-   background-color: var(--faint-green);
+.navigationbar .navigation-user-name-or-login .sign-in-btn:hover {
+  background-color: var(--faint-green);
 }
 
-
-.navigationbar .bottom-part .navigation-user-name-or-login .sign-in-btn:active{
+.navigationbar .navigation-user-name-or-login .sign-in-btn:active {
   transform: scale(0.9);
 }
 
-
-
 /* ------------------------Main Section (this is the section below the navigation page)-------------------------- */
-.main{
+.main {
   width: 100%;
   height: 88%;
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
 }
-
-
 
 /* ------------------------this is for the swiper section--------------------------- */
 
-.slide-main-container{
+.slide-main-container {
   width: 100%;
   height: 45%;
   overflow: hidden;
 }
-.home-slider{
+.home-slider {
   width: 100%;
   height: 100%;
 }
-.home-slider img{
+.home-slider img {
   width: 100%;
   height: auto;
-  object-fit:contain;
+  object-fit: contain;
+}
+
+/* -----------------main page catergory filter section--------------------------- */
+.category-filter-section {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-filters-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.category-filter {
+  height: 100%;
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.catergory-icon {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--base-green);
+  font-size: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid black;
+  margin-bottom: 5px;
+  background-color: var(--base-white);
+  transition: 0.3s;
+}
+
+.catergory-icon:hover {
+  background-color: var(--faint-green);
+  color: var(--base-black);
+}
+
+.catergory-icon:active {
+  transform: scale(0.9);
+}
+
+.category-name {
+  border: none;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+  background-color: var(--base-white);
 }
