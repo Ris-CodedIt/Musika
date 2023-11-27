@@ -3,10 +3,10 @@ import React from 'react'
 const AllCategory = () => {
   return (
     <>
-    <div className="row all-category-container">
+    <div className="row all-category-container m-4">
       
       
-      <div className="col-md-3 col-sm-5 mx-auto all-product-category-card">
+      <div className="col-md-3 col-sm-10 mx-auto all-product-category-card">
         <div className="all-multi-image-container">
           <div className="all-images-div">
             <div className="all-img-sec"></div>
@@ -22,7 +22,7 @@ const AllCategory = () => {
 
       
       
-      <div className="col-md-3 col-sm-5 mx-auto all-product-category-card">
+      <div className="col-md-3 col-sm-10 mx-auto all-product-category-card">
         <div className="all-multi-image-container">
           <div className="all-images-div">
             <div className="all-img-sec"></div>
@@ -38,7 +38,7 @@ const AllCategory = () => {
 
       
       
-      <div className="col-md-3 col-sm-5 mx-auto all-product-category-card">
+      <div className="col-md-3 col-sm-10 mx-auto all-product-category-card">
         <div className="all-multi-image-container">
           <div className="all-images-div">
             <div className="all-img-sec"></div>
