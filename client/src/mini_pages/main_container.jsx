@@ -1,6 +1,6 @@
 import HomePageSlider from "../components/home_page_slider"
 import CategoryFilter from "../components/category_filter"
-import AllCategory from "../components/AllCategories"
+import AllCategoryContainer from "../components/AllCategoriesContainer"
 import ProductsContainer from "../components/ProductsContainer"
 
 const MainContainer = () => {
@@ -13,7 +13,8 @@ const MainContainer = () => {
                <CategoryFilter/>
             </div>
             <div className="mini-page-container">
-                <ProductsContainer/>
+                {/* <ProductsContainer/> */}
+                <AllCategoryContainer/>
             </div>
             
         </div>
