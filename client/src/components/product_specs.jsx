@@ -1,5 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faStar,faStarHalfStroke} from '@fortawesome/free-solid-svg-icons'
+import RatingComponent from "./rating_component"
 
 const ProductSpecs = () => {
   return (
@@ -10,13 +9,7 @@ const ProductSpecs = () => {
             
         </div>
         <div className="ps-detail-div">
-            <div className="ps-rating-stars">
-                <FontAwesomeIcon icon={faStar} />
-                <FontAwesomeIcon icon={faStar} />
-                <FontAwesomeIcon icon={faStar} />
-                <FontAwesomeIcon icon={faStar} />
-                <FontAwesomeIcon icon={faStarHalfStroke} />
-            </div>
+             <RatingComponent rating={3.2}/>
             <div className="ps-review-count">240 reviews</div>
         </div>
         <div className="ps-descrpition-text">
